@@ -8,7 +8,7 @@
 Breakeven is a small, focused calculator: enter your monthly token volume and pick a GPU, and
 it plots the true crossover between running your own hardware and paying an API per token —
 amortized GPU cost, electricity, and utilization included. Drag the slider, watch the two lines
-cross, and read off the number: *"break-even: 42M tokens/mo."*
+cross, and read off the number: _"break-even: 42M tokens/mo."_
 
 ## Why
 
@@ -22,8 +22,8 @@ price) and it tells you the exact monthly volume at which owning wins.
 
 Move the monthly-tokens slider. Two lines are plotted live — **API cost** (linear in tokens) and
 **self-host cost** (flat-ish: GPU amortization + power, independent of volume up to the GPU's
-throughput ceiling). Where they cross lights up on the chart with the number: *"break-even: 42M
-tokens/mo."* Everything below that volume, renting wins. Everything above it, owning wins.
+throughput ceiling). Where they cross lights up on the chart with the number: _"break-even: 42M
+tokens/mo."_ Everything below that volume, renting wins. Everything above it, owning wins.
 
 ## Planned features
 

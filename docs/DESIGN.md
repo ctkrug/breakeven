@@ -16,18 +16,18 @@ warm-papered, and poster-loud instead — no ink-blue grid, no near-black surfac
 
 ## 2. Tokens
 
-| Token | Value | Use |
-|---|---|---|
-| `--bg` | `#F5EFE3` | page background — warm cream paper |
-| `--surface-1` | `#FFFFFF` | cards, panels |
-| `--surface-2` | `#E8E1D2` | secondary panels, input tracks, table stripes |
-| `--text` | `#14120F` | primary ink |
-| `--text-muted` | `#6B6459` | secondary labels, captions |
-| `--accent` | `#E8451A` | API cost line, primary CTA, "rent" side |
-| `--accent-support` | `#0E7C7B` | self-host cost line, "own" side |
-| `--success` | `#1F9D55` | positive/confirmation states |
-| `--danger` | `#D6293E` | error/invalid input states |
-| `--line` | `#14120F` | rules, borders — always solid, never soft gray |
+| Token              | Value     | Use                                            |
+| ------------------ | --------- | ---------------------------------------------- |
+| `--bg`             | `#F5EFE3` | page background — warm cream paper             |
+| `--surface-1`      | `#FFFFFF` | cards, panels                                  |
+| `--surface-2`      | `#E8E1D2` | secondary panels, input tracks, table stripes  |
+| `--text`           | `#14120F` | primary ink                                    |
+| `--text-muted`     | `#6B6459` | secondary labels, captions                     |
+| `--accent`         | `#E8451A` | API cost line, primary CTA, "rent" side        |
+| `--accent-support` | `#0E7C7B` | self-host cost line, "own" side                |
+| `--success`        | `#1F9D55` | positive/confirmation states                   |
+| `--danger`         | `#D6293E` | error/invalid input states                     |
+| `--line`           | `#14120F` | rules, borders — always solid, never soft gray |
 
 **Type pairing:** Display — **Archivo Black** (900, headline numerals, the breakeven callout,
 the wordmark). UI — **Space Grotesk** (400/500/700, labels, inputs, body copy, table data).

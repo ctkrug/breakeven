@@ -45,7 +45,8 @@ export function monthlySelfHostCost({
  * @param {number} utilization
  */
 export function maxTokensPerMonth(tokensPerSecond, hoursPerDay, utilization) {
-  const secondsPerMonth = hoursPerDay * 3600 * HOURS_PER_MONTH_DAY * utilization;
+  const secondsPerMonth =
+    hoursPerDay * 3600 * HOURS_PER_MONTH_DAY * utilization;
   return tokensPerSecond * secondsPerMonth;
 }
 
