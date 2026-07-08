@@ -124,3 +124,63 @@ a {
   margin: 0;
   max-width: 60ch;
 }
+
+.layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 var(--space-3) var(--space-6);
+}
+
+@media (min-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 65fr) minmax(0, 35fr);
+    align-items: start;
+  }
+}
+
+.chart-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background: var(--surface-1);
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-hard);
+  padding: var(--space-3);
+  position: relative;
+}
+
+.chart-panel::before,
+.chart-panel::after {
+  content: "";
+  position: absolute;
+  top: var(--space-1);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  background:
+    linear-gradient(currentColor, currentColor) center / 100% 1.5px no-repeat,
+    linear-gradient(currentColor, currentColor) center / 1.5px 100% no-repeat;
+}
+
+.chart-panel::before {
+  left: var(--space-1);
+  color: var(--accent);
+}
+
+.chart-panel::after {
+  right: var(--space-1);
+  color: var(--accent-support);
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
