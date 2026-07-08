@@ -19,6 +19,7 @@ function stubCanvasContext() {
     fill() {},
     arc() {},
     fillText() {},
+    measureText: (text) => ({ width: text.length * 7 }),
     setLineDash() {},
     setTransform() {},
   };

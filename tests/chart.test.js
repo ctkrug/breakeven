@@ -23,6 +23,9 @@ function createStubContext() {
       calls.fillText++;
       calls.lastText = text;
     },
+    measureText(text) {
+      return { width: text.length * 7 };
+    },
     setLineDash(pattern) {
       calls.setLineDash.push(pattern);
     },
