@@ -150,6 +150,8 @@ function currentPricePerMillionTokens() {
   return state.customApiPrice ?? state.apiPrice.pricePerMillionTokens;
 }
 
+const ceilingNote = document.getElementById("ceilingNote");
+
 function render() {
   const selfHostCost = currentSelfHostMonthlyCost();
   const pricePerMillionTokens = currentPricePerMillionTokens();
@@ -163,6 +165,10 @@ function render() {
   breakevenValueEl.textContent = Number.isFinite(breakeven)
     ? `${formatTokensLabel(breakeven)} tokens/mo`
     : "never";
+
+  const pastCeiling = state.tokensPerMonth > ceilingTokens;
+  ceilingNote.textContent = `${state.gpu.name} tops out around ${formatTokensLabel(ceilingTokens)} tokens/mo at this utilization — scaling further requires a second GPU.`;
+  ceilingNote.classList.toggle("ceiling-note--exceeded", pastCeiling);
 
   const { width, height, ctx } = fitCanvasToContainer(canvas);
   const styles = getComputedStyle(document.documentElement);
