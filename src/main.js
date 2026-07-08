@@ -1,3 +1,17 @@
+import {
+  breakevenTokens,
+  maxTokensPerMonth,
+  monthlySelfHostCost,
+} from "./model.js";
+import {
+  DEFAULT_ASSUMPTIONS,
+  DEFAULT_TOKENS_PER_MONTH,
+  GPU_CATALOG,
+  TOKENS_SLIDER_MAX,
+  TOKENS_SLIDER_MIN,
+} from "./data.js";
+import { drawChart, fitCanvasToContainer } from "./chart.js";
+
 const app = document.getElementById("app");
 
 app.innerHTML = `
@@ -89,3 +103,99 @@ app.innerHTML = `
     </aside>
   </main>
 `;
+
+const state = {
+  tokensPerMonth: DEFAULT_TOKENS_PER_MONTH,
+  gpu: GPU_CATALOG[0],
+  ...DEFAULT_ASSUMPTIONS,
+};
+
+const canvas = document.getElementById("chartCanvas");
+const breakevenValueEl = document.getElementById("breakevenValue");
+const tokensSlider = document.getElementById("tokensSlider");
+const tokensNumber = document.getElementById("tokensNumber");
+
+tokensSlider.min = String(TOKENS_SLIDER_MIN);
+tokensSlider.max = String(TOKENS_SLIDER_MAX);
+tokensSlider.value = String(state.tokensPerMonth);
+tokensNumber.value = String(state.tokensPerMonth);
+
+function formatTokensLabel(n) {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+  return `${Math.round(n)}`;
+}
+
+function currentSelfHostMonthlyCost() {
+  return monthlySelfHostCost({
+    gpuPrice: state.gpu.gpuPrice,
+    lifetimeMonths: state.lifetimeMonths,
+    powerDrawWatts: state.gpu.powerDrawWatts,
+    hoursPerDay: state.hoursPerDay,
+    pricePerKwh: state.pricePerKwh,
+    utilization: state.utilization,
+  });
+}
+
+function currentPricePerMillionTokens() {
+  return 3; // placeholder until the API price panel is wired in
+}
+
+function render() {
+  const selfHostCost = currentSelfHostMonthlyCost();
+  const pricePerMillionTokens = currentPricePerMillionTokens();
+  const ceilingTokens = maxTokensPerMonth(
+    state.gpu.tokensPerSecond,
+    state.hoursPerDay,
+    state.utilization
+  );
+  const breakeven = breakevenTokens(selfHostCost, pricePerMillionTokens);
+
+  breakevenValueEl.textContent = Number.isFinite(breakeven)
+    ? `${formatTokensLabel(breakeven)} tokens/mo`
+    : "never";
+
+  const { width, height, ctx } = fitCanvasToContainer(canvas);
+  const styles = getComputedStyle(document.documentElement);
+  drawChart(
+    ctx,
+    { width, height },
+    {
+      tokensMax: Number(tokensSlider.max),
+      pricePerMillionTokens,
+      selfHostMonthlyCost: selfHostCost,
+      ceilingTokens,
+      breakevenTokens: breakeven,
+      currentTokens: state.tokensPerMonth,
+      colors: {
+        api: styles.getPropertyValue("--accent").trim(),
+        selfHost: styles.getPropertyValue("--accent-support").trim(),
+        ink: styles.getPropertyValue("--line").trim(),
+        mutedInk: styles.getPropertyValue("--text-muted").trim(),
+        grid: styles.getPropertyValue("--surface-2").trim(),
+      },
+    }
+  );
+}
+
+function setTokens(value) {
+  state.tokensPerMonth = value;
+  tokensSlider.value = String(value);
+  tokensNumber.value = String(value);
+  render();
+}
+
+tokensSlider.addEventListener("input", () => {
+  setTokens(Number(tokensSlider.value));
+});
+
+tokensNumber.addEventListener("input", () => {
+  const value = Number(tokensNumber.value);
+  if (Number.isFinite(value) && value >= 0) {
+    setTokens(value);
+  }
+});
+
+window.addEventListener("resize", render);
+
+render();
