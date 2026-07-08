@@ -2,7 +2,14 @@ import { describe, expect, it } from "vitest";
 import { drawChart } from "../src/chart.js";
 
 function createStubContext() {
-  const calls = { stroke: 0, fill: 0, arc: 0, fillText: 0, setLineDash: [] };
+  const calls = {
+    stroke: 0,
+    fill: 0,
+    arc: 0,
+    fillText: 0,
+    setLineDash: [],
+    textCalls: [],
+  };
   const ctx = {
     save() {},
     restore() {},
@@ -19,9 +26,10 @@ function createStubContext() {
     arc() {
       calls.arc++;
     },
-    fillText(text) {
+    fillText(text, x, y) {
       calls.fillText++;
       calls.lastText = text;
+      calls.textCalls.push({ text, x, y });
     },
     measureText(text) {
       return { width: text.length * 7 };
@@ -107,5 +115,23 @@ describe("drawChart", () => {
         }
       )
     ).not.toThrow();
+  });
+
+  it("keeps the breakeven label fully inside the plot area on a narrow canvas", () => {
+    const width = 340;
+    const { ctx, calls } = createStubContext();
+    drawChart(
+      ctx,
+      { width, height: 500 },
+      { ...baseParams, breakevenTokens: 90_000_000 }
+    );
+    const labelCall = calls.textCalls.find((c) =>
+      c.text.includes("break-even")
+    );
+    expect(labelCall).toBeDefined();
+    const labelWidth = ctx.measureText(labelCall.text).width;
+    // PAD.left = 72, PAD.right = 24 in src/chart.js
+    expect(labelCall.x).toBeGreaterThanOrEqual(72);
+    expect(labelCall.x + labelWidth).toBeLessThanOrEqual(width - 24);
   });
 });
