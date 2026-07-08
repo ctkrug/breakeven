@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { breakevenTokens, monthlySelfHostCost } from "../src/model.js";
-import { DEFAULT_ASSUMPTIONS, GPU_CATALOG } from "../src/data.js";
+import {
+  API_PRICE_CATALOG,
+  DEFAULT_ASSUMPTIONS,
+  GPU_CATALOG,
+} from "../src/data.js";
 
 function stubCanvasContext() {
   const ctx = {
@@ -51,7 +55,10 @@ describe("app bootstrap", () => {
       pricePerKwh: DEFAULT_ASSUMPTIONS.pricePerKwh,
       utilization: DEFAULT_ASSUMPTIONS.utilization,
     });
-    const expected = breakevenTokens(selfHostCost, 3);
+    const expected = breakevenTokens(
+      selfHostCost,
+      API_PRICE_CATALOG[0].pricePerMillionTokens
+    );
     const text = document.getElementById("breakevenValue").textContent;
     expect(text).toContain(`${(expected / 1_000_000).toFixed(1)}M`);
   });
