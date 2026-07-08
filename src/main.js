@@ -120,6 +120,7 @@ const state = {
 };
 
 const canvas = document.getElementById("chartCanvas");
+const breakevenCallout = document.getElementById("breakevenCallout");
 const breakevenValueEl = document.getElementById("breakevenValue");
 const tokensSlider = document.getElementById("tokensSlider");
 const tokensNumber = document.getElementById("tokensNumber");
@@ -162,9 +163,16 @@ function render() {
   );
   const breakeven = breakevenTokens(selfHostCost, pricePerMillionTokens);
 
-  breakevenValueEl.textContent = Number.isFinite(breakeven)
+  const breakevenLabel = Number.isFinite(breakeven)
     ? `${formatTokensLabel(breakeven)} tokens/mo`
     : "never";
+  if (breakevenLabel !== breakevenValueEl.textContent) {
+    breakevenValueEl.textContent = breakevenLabel;
+    breakevenCallout.classList.remove("stamp");
+    // force a reflow so re-adding the class restarts the animation
+    void breakevenCallout.offsetWidth;
+    breakevenCallout.classList.add("stamp");
+  }
 
   const pastCeiling = state.tokensPerMonth > ceilingTokens;
   ceilingNote.textContent = `${state.gpu.name} tops out around ${formatTokensLabel(ceilingTokens)} tokens/mo at this utilization — scaling further requires a second GPU.`;
