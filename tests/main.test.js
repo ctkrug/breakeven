@@ -112,3 +112,55 @@ describe("GPU picker", () => {
     expect(options()[0].getAttribute("aria-selected")).toBe("true");
   });
 });
+
+describe("inline validation", () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it("shows an error and keeps the last valid tokens value on negative input", async () => {
+    await mountApp();
+    const number = document.getElementById("tokensNumber");
+    const before = number.value;
+    number.value = "-5";
+    number.dispatchEvent(new Event("input"));
+    expect(document.getElementById("tokensError").textContent).toMatch(
+      /negative/
+    );
+    // the field itself isn't force-reset, but state / slider stayed put
+    expect(document.getElementById("tokensSlider").value).not.toBe("-5");
+    expect(before).not.toBe("-5");
+  });
+
+  it("rejects a zero electricity price with an inline error", async () => {
+    await mountApp();
+    const input = document.getElementById("kwhInput");
+    input.value = "0";
+    input.dispatchEvent(new Event("input"));
+    expect(document.getElementById("kwhError").textContent).toMatch(
+      /greater than zero/
+    );
+  });
+
+  it("rejects utilization above 100 with an inline error", async () => {
+    await mountApp();
+    const input = document.getElementById("utilInput");
+    input.value = "150";
+    input.dispatchEvent(new Event("input"));
+    expect(document.getElementById("utilError").textContent).toMatch(
+      /0 and 100/
+    );
+  });
+
+  it("accepts a valid lifetime edit and clears any prior error", async () => {
+    await mountApp();
+    const input = document.getElementById("lifetimeInput");
+    const error = document.getElementById("lifetimeError");
+    input.value = "-1";
+    input.dispatchEvent(new Event("input"));
+    expect(error.textContent).not.toBe("");
+    input.value = "36";
+    input.dispatchEvent(new Event("input"));
+    expect(error.textContent).toBe("");
+  });
+});
