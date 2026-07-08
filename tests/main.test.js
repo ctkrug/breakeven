@@ -171,3 +171,62 @@ describe("inline validation", () => {
     expect(error.textContent).toBe("");
   });
 });
+
+describe("API price panel", () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it("renders one option per reference price with the first selected", async () => {
+    await mountApp();
+    const options = document.querySelectorAll("#apiPicker .option-btn");
+    expect(options).toHaveLength(API_PRICE_CATALOG.length);
+    expect(options[0].getAttribute("aria-selected")).toBe("true");
+  });
+
+  it("selecting a reference price changes the breakeven callout", async () => {
+    await mountApp();
+    const before = document.getElementById("breakevenValue").textContent;
+    const options = document.querySelectorAll("#apiPicker .option-btn");
+    options[options.length - 1].dispatchEvent(
+      new MouseEvent("click", { bubbles: true })
+    );
+    const after = document.getElementById("breakevenValue").textContent;
+    expect(after).not.toBe(before);
+  });
+
+  it("a custom price overrides the selected reference without deselecting it", async () => {
+    await mountApp();
+    const input = document.getElementById("customApiInput");
+    input.value = "10";
+    input.dispatchEvent(new Event("input"));
+    const selected = document.querySelector(
+      '#apiPicker .option-btn[aria-selected="true"]'
+    );
+    expect(selected).not.toBeNull();
+    expect(document.getElementById("customApiError").textContent).toBe("");
+  });
+
+  it("rejects a zero custom price with an inline error", async () => {
+    await mountApp();
+    const input = document.getElementById("customApiInput");
+    input.value = "0";
+    input.dispatchEvent(new Event("input"));
+    expect(document.getElementById("customApiError").textContent).toMatch(
+      /greater than zero/
+    );
+  });
+
+  it("clearing the custom price field reverts to the selected reference", async () => {
+    await mountApp();
+    const input = document.getElementById("customApiInput");
+    input.value = "10";
+    input.dispatchEvent(new Event("input"));
+    const withOverride = document.getElementById("breakevenValue").textContent;
+    input.value = "";
+    input.dispatchEvent(new Event("input"));
+    const afterClear = document.getElementById("breakevenValue").textContent;
+    expect(afterClear).not.toBe(withOverride);
+    expect(document.getElementById("customApiError").textContent).toBe("");
+  });
+});
