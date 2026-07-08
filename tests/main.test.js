@@ -3,6 +3,7 @@ import { breakevenTokens, monthlySelfHostCost } from "../src/model.js";
 import {
   API_PRICE_CATALOG,
   DEFAULT_ASSUMPTIONS,
+  DEFAULT_TOKENS_PER_MONTH,
   GPU_CATALOG,
 } from "../src/data.js";
 
@@ -255,5 +256,46 @@ describe("breakeven stamp animation", () => {
     const hadStampBefore = callout.classList.contains("stamp");
     window.dispatchEvent(new Event("resize"));
     expect(callout.classList.contains("stamp")).toBe(hadStampBefore);
+  });
+});
+
+describe("shareable URL state", () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it("writes the current scenario to the URL after a change", async () => {
+    await mountApp();
+    const options = document.querySelectorAll("#gpuPicker .option-btn");
+    const targetId = GPU_CATALOG[GPU_CATALOG.length - 1].id;
+    const target = [...options].find((o) => o.dataset.id === targetId);
+    target.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(window.location.search).toContain(`gpu=${targetId}`);
+  });
+
+  it("restores a scenario encoded in the URL on load", async () => {
+    const targetGpu = GPU_CATALOG[GPU_CATALOG.length - 1];
+    document.body.innerHTML = '<div id="app"></div>';
+    window.history.replaceState(
+      null,
+      "",
+      `/?gpu=${targetGpu.id}&tokens=42000000`
+    );
+    stubCanvasContext();
+    vi.resetModules();
+    await import("../src/main.js");
+
+    expect(document.getElementById("tokensNumber").value).toBe("42000000");
+    const selected = document.querySelector(
+      '#gpuPicker .option-btn[aria-selected="true"]'
+    );
+    expect(selected.dataset.id).toBe(targetGpu.id);
+  });
+
+  it("falls back to documented defaults with no query string", async () => {
+    await mountApp();
+    expect(document.getElementById("tokensNumber").value).toBe(
+      String(DEFAULT_TOKENS_PER_MONTH)
+    );
   });
 });
