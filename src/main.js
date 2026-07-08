@@ -18,6 +18,7 @@ import {
   validateTokensPerMonth,
   validateUtilizationPercent,
 } from "./validation.js";
+import { decodeScenario, encodeScenario } from "./urlState.js";
 
 const app = document.getElementById("app");
 
@@ -111,12 +112,36 @@ app.innerHTML = `
   </main>
 `;
 
-const state = {
+const scenarioDefaults = {
   tokensPerMonth: DEFAULT_TOKENS_PER_MONTH,
-  gpu: GPU_CATALOG[0],
-  apiPrice: API_PRICE_CATALOG[0],
+  gpuId: GPU_CATALOG[0].id,
+  apiPriceId: API_PRICE_CATALOG[0].id,
   customApiPrice: null,
-  ...DEFAULT_ASSUMPTIONS,
+  pricePerKwh: DEFAULT_ASSUMPTIONS.pricePerKwh,
+  utilizationPercent: Math.round(DEFAULT_ASSUMPTIONS.utilization * 100),
+  lifetimeMonths: DEFAULT_ASSUMPTIONS.lifetimeMonths,
+};
+const decodedScenario = decodeScenario(
+  window.location.search,
+  scenarioDefaults,
+  {
+    gpuIds: GPU_CATALOG.map((g) => g.id),
+    apiPriceIds: API_PRICE_CATALOG.map((e) => e.id),
+  }
+);
+
+const state = {
+  tokensPerMonth: decodedScenario.tokensPerMonth,
+  gpu:
+    GPU_CATALOG.find((g) => g.id === decodedScenario.gpuId) ?? GPU_CATALOG[0],
+  apiPrice: decodedScenario.apiPriceId
+    ? API_PRICE_CATALOG.find((e) => e.id === decodedScenario.apiPriceId)
+    : API_PRICE_CATALOG[0],
+  customApiPrice: decodedScenario.customApiPrice,
+  pricePerKwh: decodedScenario.pricePerKwh,
+  utilization: decodedScenario.utilizationPercent / 100,
+  lifetimeMonths: decodedScenario.lifetimeMonths,
+  hoursPerDay: DEFAULT_ASSUMPTIONS.hoursPerDay,
 };
 
 const canvas = document.getElementById("chartCanvas");
@@ -199,6 +224,22 @@ function render() {
       },
     }
   );
+
+  syncUrl();
+}
+
+function syncUrl() {
+  const query = encodeScenario({
+    tokensPerMonth: state.tokensPerMonth,
+    gpuId: state.gpu.id,
+    apiPriceId: state.customApiPrice != null ? null : state.apiPrice.id,
+    customApiPrice: state.customApiPrice,
+    pricePerKwh: state.pricePerKwh,
+    utilizationPercent: Math.round(state.utilization * 100),
+    lifetimeMonths: state.lifetimeMonths,
+  });
+  const newUrl = `${window.location.pathname}?${query}`;
+  window.history.replaceState(null, "", newUrl);
 }
 
 function setTokens(value) {
@@ -352,6 +393,10 @@ const apiPicker = document.getElementById("apiPicker");
 const customApiInput = document.getElementById("customApiInput");
 const customApiError = document.getElementById("customApiError");
 
+if (state.customApiPrice != null) {
+  customApiInput.value = String(state.customApiPrice);
+}
+
 renderOptionPicker(
   apiPicker,
   API_PRICE_CATALOG,
@@ -378,6 +423,18 @@ customApiInput.addEventListener("input", () => {
     render();
   } else {
     customApiError.textContent = result.error;
+  }
+});
+
+const copyLinkBtn = document.getElementById("copyLinkBtn");
+const copyStatus = document.getElementById("copyStatus");
+
+copyLinkBtn.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(window.location.href);
+    copyStatus.textContent = "Link copied.";
+  } catch {
+    copyStatus.textContent = window.location.href;
   }
 });
 
