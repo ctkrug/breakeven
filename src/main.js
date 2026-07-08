@@ -438,6 +438,44 @@ copyLinkBtn.addEventListener("click", async () => {
   }
 });
 
+function renderMethodology() {
+  const body = document.getElementById("methodologyBody");
+  const gpuNotes = GPU_CATALOG.map(
+    (g) => `<li><strong>${g.name}</strong> — ${g.note}</li>`
+  ).join("");
+  const apiNotes = API_PRICE_CATALOG.map(
+    (e) => `<li><strong>${e.name}</strong> — ${e.note}</li>`
+  ).join("");
+  body.innerHTML = `
+    <p>
+      <strong>API cost</strong> is linear: monthly tokens ÷ 1,000,000 ×
+      price per million tokens.
+    </p>
+    <p>
+      <strong>Self-host cost</strong> is flat below the GPU's throughput
+      ceiling: purchase price amortized over its lifetime, plus electricity
+      (power draw × runtime hours × utilization × price per kWh). It does
+      not grow with token volume until a second GPU is needed.
+    </p>
+    <p><strong>Default assumptions:</strong></p>
+    <ul>
+      <li>Electricity: $${DEFAULT_ASSUMPTIONS.pricePerKwh.toFixed(2)}/kWh — a
+        round-number approximation of a typical US residential/commercial
+        blended rate; edit it for your local rate.</li>
+      <li>Utilization: ${Math.round(DEFAULT_ASSUMPTIONS.utilization * 100)}%
+        — hardware is rarely pegged at 100%; this reflects real-world duty
+        cycle for a small-team serving workload.</li>
+      <li>Lifetime: ${DEFAULT_ASSUMPTIONS.lifetimeMonths} months — a common
+        amortization window before hardware is replaced or resold.</li>
+    </ul>
+    <p><strong>GPU catalog basis:</strong></p>
+    <ul>${gpuNotes}</ul>
+    <p><strong>API price catalog basis:</strong></p>
+    <ul>${apiNotes}</ul>
+  `;
+}
+renderMethodology();
+
 window.addEventListener("resize", render);
 
 render();
