@@ -196,6 +196,81 @@ tokensNumber.addEventListener("input", () => {
   }
 });
 
+function renderOptionPicker(container, items, selectedId, labelOf, onSelect) {
+  container.innerHTML = items
+    .map(
+      (item) => `
+        <button
+          type="button"
+          class="option-btn"
+          role="option"
+          data-id="${item.id}"
+          aria-selected="${item.id === selectedId}"
+          tabindex="${item.id === selectedId ? "0" : "-1"}"
+        >${labelOf(item)}</button>
+      `
+    )
+    .join("");
+
+  function selectById(id, focus) {
+    onSelect(id);
+    [...container.children].forEach((btn) => {
+      const selected = btn.dataset.id === id;
+      btn.setAttribute("aria-selected", String(selected));
+      btn.tabIndex = selected ? 0 : -1;
+      if (selected && focus) btn.focus();
+    });
+  }
+
+  container.addEventListener("click", (event) => {
+    const btn = event.target.closest(".option-btn");
+    if (btn) selectById(btn.dataset.id, false);
+  });
+
+  container.addEventListener("keydown", (event) => {
+    const buttons = [...container.children];
+    const currentIndex = buttons.findIndex(
+      (b) => b.getAttribute("aria-selected") === "true"
+    );
+    if (["ArrowRight", "ArrowDown"].includes(event.key)) {
+      event.preventDefault();
+      selectById(buttons[(currentIndex + 1) % buttons.length].dataset.id, true);
+    } else if (["ArrowLeft", "ArrowUp"].includes(event.key)) {
+      event.preventDefault();
+      selectById(
+        buttons[(currentIndex - 1 + buttons.length) % buttons.length].dataset
+          .id,
+        true
+      );
+    } else if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      const btn = event.target.closest(".option-btn");
+      if (btn) selectById(btn.dataset.id, true);
+    }
+  });
+}
+
+const gpuPicker = document.getElementById("gpuPicker");
+const gpuNote = document.getElementById("gpuNote");
+
+function updateGpuNote() {
+  gpuNote.textContent = state.gpu.note;
+}
+
+renderOptionPicker(
+  gpuPicker,
+  GPU_CATALOG,
+  state.gpu.id,
+  (gpu) =>
+    `<span class="option-name">${gpu.name}</span><span class="option-meta">$${gpu.gpuPrice.toLocaleString()} · ${gpu.powerDrawWatts}W</span>`,
+  (id) => {
+    state.gpu = GPU_CATALOG.find((g) => g.id === id);
+    updateGpuNote();
+    render();
+  }
+);
+updateGpuNote();
+
 window.addEventListener("resize", render);
 
 render();
