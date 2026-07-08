@@ -5,6 +5,7 @@
  */
 
 function numeric(value) {
+  if (typeof value === "string" && value.trim() === "") return null;
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
 }
