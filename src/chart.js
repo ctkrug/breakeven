@@ -186,14 +186,13 @@ export function drawChart(ctx, size, params) {
 
     ctx.save();
     ctx.font = "900 13px 'Archivo Black', system-ui, sans-serif";
+    const label = `break-even: ${formatTokens(breakevenTokens)} tokens/mo`;
+    const fitsRight =
+      x + 10 + ctx.measureText(label).width <= width - PAD.right;
     ctx.fillStyle = colors.ink;
-    ctx.textAlign = x > width - PAD.right - 90 ? "right" : "left";
+    ctx.textAlign = fitsRight ? "left" : "right";
     ctx.textBaseline = "bottom";
-    ctx.fillText(
-      `break-even: ${formatTokens(breakevenTokens)} tokens/mo`,
-      x + (ctx.textAlign === "right" ? -10 : 10),
-      y - 10
-    );
+    ctx.fillText(label, x + (fitsRight ? 10 : -10), y - 10);
     ctx.restore();
   }
 
