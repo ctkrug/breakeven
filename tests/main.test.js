@@ -299,3 +299,40 @@ describe("shareable URL state", () => {
     );
   });
 });
+
+describe("methodology panel", () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it("documents a basis for every default and catalog entry", async () => {
+    await mountApp();
+    const text = document.getElementById("methodologyBody").textContent;
+    expect(text).toContain(`${DEFAULT_ASSUMPTIONS.pricePerKwh.toFixed(2)}`);
+    for (const gpu of GPU_CATALOG) {
+      expect(text).toContain(gpu.name);
+    }
+    for (const entry of API_PRICE_CATALOG) {
+      expect(text).toContain(entry.name);
+    }
+  });
+});
+
+describe("copy shareable link", () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it("writes the current URL to the clipboard and shows a status message", async () => {
+    await mountApp();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    document.getElementById("copyLinkBtn").click();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(writeText).toHaveBeenCalledWith(window.location.href);
+    expect(document.getElementById("copyStatus").textContent).toBe(
+      "Link copied."
+    );
+  });
+});
