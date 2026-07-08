@@ -11,6 +11,12 @@ import {
   TOKENS_SLIDER_MIN,
 } from "./data.js";
 import { drawChart, fitCanvasToContainer } from "./chart.js";
+import {
+  validateLifetimeMonths,
+  validatePrice,
+  validateTokensPerMonth,
+  validateUtilizationPercent,
+} from "./validation.js";
 
 const app = document.getElementById("app");
 
@@ -185,14 +191,22 @@ function setTokens(value) {
   render();
 }
 
+const tokensError = document.getElementById("tokensError");
+
 tokensSlider.addEventListener("input", () => {
+  tokensError.textContent = "";
   setTokens(Number(tokensSlider.value));
 });
 
 tokensNumber.addEventListener("input", () => {
-  const value = Number(tokensNumber.value);
-  if (Number.isFinite(value) && value >= 0) {
-    setTokens(value);
+  const result = validateTokensPerMonth(tokensNumber.value);
+  if (result.valid) {
+    tokensError.textContent = "";
+    state.tokensPerMonth = result.value;
+    tokensSlider.value = String(result.value);
+    render();
+  } else {
+    tokensError.textContent = result.error;
   }
 });
 
@@ -270,6 +284,52 @@ renderOptionPicker(
   }
 );
 updateGpuNote();
+
+function wireValidatedField(input, errorEl, validate, apply) {
+  input.addEventListener("input", () => {
+    const result = validate(input.value);
+    if (result.valid) {
+      errorEl.textContent = "";
+      apply(result.value);
+      render();
+    } else {
+      errorEl.textContent = result.error;
+    }
+  });
+}
+
+const kwhInput = document.getElementById("kwhInput");
+const utilInput = document.getElementById("utilInput");
+const lifetimeInput = document.getElementById("lifetimeInput");
+
+kwhInput.value = String(state.pricePerKwh);
+utilInput.value = String(Math.round(state.utilization * 100));
+lifetimeInput.value = String(state.lifetimeMonths);
+
+wireValidatedField(
+  kwhInput,
+  document.getElementById("kwhError"),
+  (v) => validatePrice(v, "Electricity price"),
+  (v) => {
+    state.pricePerKwh = v;
+  }
+);
+wireValidatedField(
+  utilInput,
+  document.getElementById("utilError"),
+  validateUtilizationPercent,
+  (v) => {
+    state.utilization = v;
+  }
+);
+wireValidatedField(
+  lifetimeInput,
+  document.getElementById("lifetimeError"),
+  validateLifetimeMonths,
+  (v) => {
+    state.lifetimeMonths = v;
+  }
+);
 
 window.addEventListener("resize", render);
 
