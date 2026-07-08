@@ -4,6 +4,7 @@ import {
   monthlySelfHostCost,
 } from "./model.js";
 import {
+  API_PRICE_CATALOG,
   DEFAULT_ASSUMPTIONS,
   DEFAULT_TOKENS_PER_MONTH,
   GPU_CATALOG,
@@ -113,6 +114,8 @@ app.innerHTML = `
 const state = {
   tokensPerMonth: DEFAULT_TOKENS_PER_MONTH,
   gpu: GPU_CATALOG[0],
+  apiPrice: API_PRICE_CATALOG[0],
+  customApiPrice: null,
   ...DEFAULT_ASSUMPTIONS,
 };
 
@@ -144,7 +147,7 @@ function currentSelfHostMonthlyCost() {
 }
 
 function currentPricePerMillionTokens() {
-  return 3; // placeholder until the API price panel is wired in
+  return state.customApiPrice ?? state.apiPrice.pricePerMillionTokens;
 }
 
 function render() {
@@ -330,6 +333,39 @@ wireValidatedField(
     state.lifetimeMonths = v;
   }
 );
+
+const apiPicker = document.getElementById("apiPicker");
+const customApiInput = document.getElementById("customApiInput");
+const customApiError = document.getElementById("customApiError");
+
+renderOptionPicker(
+  apiPicker,
+  API_PRICE_CATALOG,
+  state.apiPrice.id,
+  (entry) =>
+    `<span class="option-name">${entry.name}</span><span class="option-meta">$${entry.pricePerMillionTokens.toFixed(2)} / 1M</span>`,
+  (id) => {
+    state.apiPrice = API_PRICE_CATALOG.find((e) => e.id === id);
+    render();
+  }
+);
+
+customApiInput.addEventListener("input", () => {
+  if (customApiInput.value.trim() === "") {
+    customApiError.textContent = "";
+    state.customApiPrice = null;
+    render();
+    return;
+  }
+  const result = validatePrice(customApiInput.value, "Custom price");
+  if (result.valid) {
+    customApiError.textContent = "";
+    state.customApiPrice = result.value;
+    render();
+  } else {
+    customApiError.textContent = result.error;
+  }
+});
 
 window.addEventListener("resize", render);
 
