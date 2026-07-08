@@ -25,21 +25,23 @@ Move the monthly-tokens slider. Two lines are plotted live — **API cost** (lin
 throughput ceiling). Where they cross lights up on the chart with the number: _"break-even: 42M
 tokens/mo."_ Everything below that volume, renting wins. Everything above it, owning wins.
 
-## Planned features
+## Features
 
-- **Token volume input** — slider + direct numeric entry, log-scaled (thousands to billions of
-  tokens/month).
-- **GPU catalog** — a curated list of GPUs (consumer + datacenter: e.g. RTX 4090, RTX 3090,
-  A100, H100) with purchase price, typical power draw, and realistic tokens/sec for common open
-  model sizes.
-- **API price catalog** — a few reference API price points ($/million tokens) for comparison,
-  editable so the numbers stay current.
-- **Amortization model** — GPU cost spread over a configurable hardware lifetime (months),
-  plus electricity cost from power draw × runtime hours × $/kWh, plus a utilization factor
-  (the GPU isn't pegged at 100% duty cycle in practice).
+- **Token volume input** — slider + direct numeric entry, with inline validation on bad input.
+- **GPU catalog** — four real GPUs (consumer + datacenter: RTX 3090, RTX 4090, A100 80GB,
+  H100 80GB) with purchase price, power draw, and a documented tokens/sec basis for each.
+- **API price catalog** — four reference API price points ($/million tokens), or type a
+  custom price that overrides the selected reference without deselecting it.
+- **Amortization model** — GPU cost spread over an editable hardware lifetime (months), plus
+  electricity cost from power draw × runtime hours × $/kWh, plus an editable utilization factor.
 - **Live crossover chart** — self-host cost line vs. API cost line over a token-volume axis,
-  with the break-even point computed and annotated directly on the chart.
-- **Shareable scenario** — inputs encoded in the URL so a specific comparison can be linked.
+  with the break-even point annotated directly on the chart and re-stamped on every change.
+- **Throughput ceiling** — past a GPU's tokens/mo ceiling the self-host line switches to a
+  dashed extrapolation, with a visible note that scaling further needs a second GPU.
+- **Shareable scenario** — every input round-trips through the URL query string; "Copy
+  shareable link" puts it on the clipboard.
+- **Methodology panel** — a plain-language explanation of both cost formulas plus the
+  documented basis for every default and catalog entry.
 
 ## Stack
 
@@ -59,9 +61,10 @@ npm run build    # production build to site/
 
 ## Status
 
-Early scaffold — see [`docs/VISION.md`](docs/VISION.md) for the full design,
-[`docs/DESIGN.md`](docs/DESIGN.md) for the visual direction, and
-[`docs/BACKLOG.md`](docs/BACKLOG.md) for the build plan.
+Core calculator is functionally complete — see [`docs/VISION.md`](docs/VISION.md) for the full
+design, [`docs/DESIGN.md`](docs/DESIGN.md) for the visual direction,
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the codebase map, and
+[`docs/BACKLOG.md`](docs/BACKLOG.md) for what's left.
 
 ## License
 
