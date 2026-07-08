@@ -74,3 +74,41 @@ describe("app bootstrap", () => {
     expect(slider.value).toBe("5000000");
   });
 });
+
+describe("GPU picker", () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it("renders one option per catalog entry with the first selected", async () => {
+    await mountApp();
+    const options = document.querySelectorAll("#gpuPicker .option-btn");
+    expect(options).toHaveLength(GPU_CATALOG.length);
+    expect(options[0].getAttribute("aria-selected")).toBe("true");
+    expect(options[0].tabIndex).toBe(0);
+    expect(options[1].tabIndex).toBe(-1);
+  });
+
+  it("selects a GPU on click and updates the note text", async () => {
+    await mountApp();
+    const secondGpu = GPU_CATALOG[1];
+    const options = document.querySelectorAll("#gpuPicker .option-btn");
+    options[1].dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(options[1].getAttribute("aria-selected")).toBe("true");
+    expect(options[0].getAttribute("aria-selected")).toBe("false");
+    expect(document.getElementById("gpuNote").textContent).toBe(secondGpu.note);
+  });
+
+  it("moves selection with ArrowRight and wraps at the end", async () => {
+    await mountApp();
+    const picker = document.getElementById("gpuPicker");
+    const options = () => document.querySelectorAll("#gpuPicker .option-btn");
+    for (let i = 0; i < GPU_CATALOG.length; i++) {
+      picker.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true })
+      );
+    }
+    // wrapped all the way around back to the first option
+    expect(options()[0].getAttribute("aria-selected")).toBe("true");
+  });
+});
