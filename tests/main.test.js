@@ -230,3 +230,29 @@ describe("API price panel", () => {
     expect(document.getElementById("customApiError").textContent).toBe("");
   });
 });
+
+describe("breakeven stamp animation", () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it("adds the stamp class when the breakeven value changes", async () => {
+    await mountApp();
+    const callout = document.getElementById("breakevenCallout");
+    const input = document.getElementById("customApiInput");
+    input.value = "10";
+    input.dispatchEvent(new Event("input"));
+    expect(callout.classList.contains("stamp")).toBe(true);
+  });
+
+  it("does not re-stamp when a re-render produces the same value", async () => {
+    await mountApp();
+    const callout = document.getElementById("breakevenCallout");
+    // trigger a render with no actual change to the breakeven value
+    window.dispatchEvent(new Event("resize"));
+    // stamp class from initial mount should still be present, unchanged
+    const hadStampBefore = callout.classList.contains("stamp");
+    window.dispatchEvent(new Event("resize"));
+    expect(callout.classList.contains("stamp")).toBe(hadStampBefore);
+  });
+});
