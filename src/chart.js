@@ -187,12 +187,16 @@ export function drawChart(ctx, size, params) {
     ctx.save();
     ctx.font = "900 13px 'Archivo Black', system-ui, sans-serif";
     const label = `break-even: ${formatTokens(breakevenTokens)} tokens/mo`;
-    const fitsRight =
-      x + 10 + ctx.measureText(label).width <= width - PAD.right;
+    const textWidth = ctx.measureText(label).width;
+    let textX = x + 10;
+    if (textX + textWidth > width - PAD.right) {
+      textX = x - 10 - textWidth;
+    }
+    textX = Math.max(PAD.left, Math.min(textX, width - PAD.right - textWidth));
     ctx.fillStyle = colors.ink;
-    ctx.textAlign = fitsRight ? "left" : "right";
+    ctx.textAlign = "left";
     ctx.textBaseline = "bottom";
-    ctx.fillText(label, x + (fitsRight ? 10 : -10), y - 10);
+    ctx.fillText(label, textX, y - 10);
     ctx.restore();
   }
 
