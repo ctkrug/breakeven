@@ -26,6 +26,7 @@ function stubCanvasContext() {
 
 async function mountApp() {
   document.body.innerHTML = '<div id="app"></div>';
+  window.history.replaceState(null, "", "/");
   stubCanvasContext();
   vi.resetModules();
   await import("../src/main.js");
