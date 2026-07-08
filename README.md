@@ -1,5 +1,8 @@
 # Breakeven
 
+[![CI](https://github.com/ctkrug/breakeven/actions/workflows/ci.yml/badge.svg)](https://github.com/ctkrug/breakeven/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 **Where does self-hosting an open model actually beat paying per-token?**
 
 Breakeven is a small, focused calculator: enter your monthly token volume and pick a GPU, and
@@ -45,9 +48,19 @@ and a small pure-function core (`src/model.js`) that holds the cost math, unit-t
 isolation from the UI. Ships as a single static `dist/` directory — no server, no build
 dependencies beyond Vite.
 
+## Getting started
+
+```sh
+npm install
+npm run dev      # local dev server
+npm test         # run the cost-model unit tests
+npm run build    # production build to site/
+```
+
 ## Status
 
-Early scaffold — see [`docs/VISION.md`](docs/VISION.md) for the full design and
+Early scaffold — see [`docs/VISION.md`](docs/VISION.md) for the full design,
+[`docs/DESIGN.md`](docs/DESIGN.md) for the visual direction, and
 [`docs/BACKLOG.md`](docs/BACKLOG.md) for the build plan.
 
 ## License
