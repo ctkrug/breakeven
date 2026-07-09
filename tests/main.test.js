@@ -419,6 +419,40 @@ describe("GPU throughput ceiling", () => {
   });
 });
 
+describe("breakeven label formatting at small scales", () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it("formats a sub-1M breakeven value in thousands", async () => {
+    await mountApp();
+    const util = document.getElementById("utilInput");
+    const lifetime = document.getElementById("lifetimeInput");
+    // Driving self-host cost near zero (no duty cycle, a long amortization
+    // window) pulls the breakeven crossover down into the thousands.
+    util.value = "0";
+    util.dispatchEvent(new Event("input"));
+    lifetime.value = "900000";
+    lifetime.dispatchEvent(new Event("input"));
+    expect(document.getElementById("breakevenValue").textContent).toMatch(
+      /^\d+K tokens\/mo$/
+    );
+  });
+
+  it("formats a sub-1K breakeven value with no suffix", async () => {
+    await mountApp();
+    const util = document.getElementById("utilInput");
+    const lifetime = document.getElementById("lifetimeInput");
+    util.value = "0";
+    util.dispatchEvent(new Event("input"));
+    lifetime.value = "9000000";
+    lifetime.dispatchEvent(new Event("input"));
+    expect(document.getElementById("breakevenValue").textContent).toMatch(
+      /^\d+ tokens\/mo$/
+    );
+  });
+});
+
 describe("methodology panel", () => {
   beforeEach(() => {
     vi.resetModules();
