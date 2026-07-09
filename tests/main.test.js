@@ -525,4 +525,17 @@ describe("copy shareable link", () => {
       window.location.href
     );
   });
+
+  it("falls back to showing the raw URL when the Clipboard API is entirely unavailable", async () => {
+    await mountApp();
+    // Older browsers and non-secure (http) contexts have no
+    // navigator.clipboard object at all, not just a rejecting one.
+    Object.assign(navigator, { clipboard: undefined });
+    expect(() => document.getElementById("copyLinkBtn").click()).not.toThrow();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(document.getElementById("copyStatus").textContent).toBe(
+      window.location.href
+    );
+  });
 });
