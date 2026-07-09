@@ -15,7 +15,10 @@ src/
   urlState.js    encodeScenario / decodeScenario — scenario <-> URL query string,
                  per-field fallback to defaults on bad/missing values
   chartMath.js   pure chart layout math: linearScale, buildSeries, splitAtCeiling
-                 (kept separate from chart.js so it's testable without a canvas)
+                 (kept separate from chart.js so it's testable without a canvas).
+                 buildSeries and chart.js both derive the API line from
+                 model.monthlyApiCost, so the drawing layer never re-implements
+                 the cost formula.
   chart.js       canvas renderer: fitCanvasToContainer (devicePixelRatio scaling)
                  + drawChart (both cost lines, breakeven marker, ceiling dash,
                  current-volume dots, registration marks) + the shared
