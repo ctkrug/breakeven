@@ -1,3 +1,4 @@
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import {
   breakevenTokens,
@@ -5,6 +6,9 @@ import {
   monthlyApiCost,
   monthlySelfHostCost,
 } from "../src/model.js";
+
+const positiveFloat = (max) =>
+  fc.float({ min: Math.fround(0.01), max: Math.fround(max), noNaN: true });
 
 describe("monthlyApiCost", () => {
   it("scales linearly with token volume", () => {
@@ -14,6 +18,22 @@ describe("monthlyApiCost", () => {
 
   it("returns 0 for 0 tokens", () => {
     expect(monthlyApiCost(0, 3)).toBe(0);
+  });
+
+  it("never decreases as token volume grows, for any positive price", () => {
+    fc.assert(
+      fc.property(
+        positiveFloat(1_000),
+        positiveFloat(1e9),
+        positiveFloat(1e9),
+        (price, a, b) => {
+          const [lo, hi] = a <= b ? [a, b] : [b, a];
+          expect(monthlyApiCost(hi, price)).toBeGreaterThanOrEqual(
+            monthlyApiCost(lo, price)
+          );
+        }
+      )
+    );
   });
 });
 
@@ -58,6 +78,21 @@ describe("maxTokensPerMonth", () => {
     const max = maxTokensPerMonth(100, 24, 1);
     expect(max).toBeCloseTo(100 * 24 * 3600 * 30.44, 0);
   });
+
+  it("is always non-negative for non-negative inputs", () => {
+    fc.assert(
+      fc.property(
+        fc.float({ min: 0, max: Math.fround(1e6), noNaN: true }),
+        fc.float({ min: 0, max: Math.fround(24), noNaN: true }),
+        fc.float({ min: 0, max: Math.fround(1), noNaN: true }),
+        (tokensPerSecond, hoursPerDay, utilization) => {
+          expect(
+            maxTokensPerMonth(tokensPerSecond, hoursPerDay, utilization)
+          ).toBeGreaterThanOrEqual(0);
+        }
+      )
+    );
+  });
 });
 
 describe("breakevenTokens", () => {
@@ -68,5 +103,21 @@ describe("breakevenTokens", () => {
 
   it("returns Infinity when API price is zero", () => {
     expect(breakevenTokens(100, 0)).toBe(Infinity);
+  });
+
+  it("round-trips through monthlyApiCost for any positive cost and price", () => {
+    fc.assert(
+      fc.property(
+        positiveFloat(1e6),
+        positiveFloat(1_000),
+        (selfHostCost, pricePerMillionTokens) => {
+          const tokens = breakevenTokens(selfHostCost, pricePerMillionTokens);
+          expect(monthlyApiCost(tokens, pricePerMillionTokens)).toBeCloseTo(
+            selfHostCost,
+            3
+          );
+        }
+      )
+    );
   });
 });
