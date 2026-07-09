@@ -1,4 +1,5 @@
 import { buildSeries, linearScale, splitAtCeiling } from "./chartMath.js";
+import { monthlyApiCost } from "./model.js";
 
 const STEPS = 120;
 const PAD = { top: 32, right: 24, bottom: 48, left: 72 };
@@ -165,7 +166,7 @@ export function drawChart(ctx, size, params) {
   // breakeven marker
   if (Number.isFinite(breakevenTokens) && breakevenTokens <= tokensMax) {
     const x = xScale(breakevenTokens);
-    const y = yScale((breakevenTokens / 1_000_000) * pricePerMillionTokens);
+    const y = yScale(monthlyApiCost(breakevenTokens, pricePerMillionTokens));
     ctx.save();
     ctx.strokeStyle = colors.ink;
     ctx.lineWidth = 1.5;
@@ -200,7 +201,7 @@ export function drawChart(ctx, size, params) {
   }
 
   // current-volume markers, cheaper line highlighted
-  const currentApiCost = (currentTokens / 1_000_000) * pricePerMillionTokens;
+  const currentApiCost = monthlyApiCost(currentTokens, pricePerMillionTokens);
   const currentSelfHostCost = selfHostMonthlyCost;
   const apiCheaper = currentApiCost <= currentSelfHostCost;
   const cx = xScale(Math.min(currentTokens, tokensMax));

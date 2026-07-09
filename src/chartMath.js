@@ -3,6 +3,8 @@
  * canvas drawing so it can be unit-tested without a DOM canvas context.
  */
 
+import { monthlyApiCost } from "./model.js";
+
 /**
  * Builds a linear scale function mapping a domain value to a range value.
  * @param {[number, number]} domain
@@ -35,7 +37,7 @@ export function buildSeries({
     const tokens = (tokensMax / steps) * i;
     points.push({
       tokens,
-      apiCost: (tokens / 1_000_000) * pricePerMillionTokens,
+      apiCost: monthlyApiCost(tokens, pricePerMillionTokens),
       selfHostCost: selfHostMonthlyCost,
     });
   }
