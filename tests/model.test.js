@@ -105,6 +105,16 @@ describe("breakevenTokens", () => {
     expect(breakevenTokens(100, 0)).toBe(Infinity);
   });
 
+  it("returns Infinity for a zero price even with zero self-host cost", () => {
+    // 100 / 0 is already Infinity in JS, so the prior case alone can pass
+    // even if the price<=0 guard is removed; 0 / 0 is NaN without it.
+    expect(breakevenTokens(0, 0)).toBe(Infinity);
+  });
+
+  it("returns Infinity for a negative-zero price, not -Infinity", () => {
+    expect(breakevenTokens(100, -0)).toBe(Infinity);
+  });
+
   it("round-trips through monthlyApiCost for any positive cost and price", () => {
     fc.assert(
       fc.property(
