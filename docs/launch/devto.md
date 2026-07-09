@@ -23,10 +23,16 @@ functions in `src/model.js` with no DOM and no imports:
 
 ```js
 export function monthlySelfHostCost({
-  gpuPrice, lifetimeMonths, powerDrawWatts, hoursPerDay, pricePerKwh, utilization,
+  gpuPrice,
+  lifetimeMonths,
+  powerDrawWatts,
+  hoursPerDay,
+  pricePerKwh,
+  utilization,
 }) {
   const amortization = gpuPrice / lifetimeMonths;
-  const kwhPerMonth = (powerDrawWatts / 1000) * hoursPerDay * 30.44 * utilization;
+  const kwhPerMonth =
+    (powerDrawWatts / 1000) * hoursPerDay * 30.44 * utilization;
   return amortization + kwhPerMonth * pricePerKwh;
 }
 
