@@ -147,6 +147,36 @@ describe("GPU picker", () => {
     // wrapped all the way around back to the first option
     expect(options()[0].getAttribute("aria-selected")).toBe("true");
   });
+
+  it("moves selection backward with ArrowLeft and wraps at the start", async () => {
+    await mountApp();
+    const picker = document.getElementById("gpuPicker");
+    const options = () => document.querySelectorAll("#gpuPicker .option-btn");
+    picker.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true })
+    );
+    // wrapped backward from the first option to the last
+    expect(
+      options()[GPU_CATALOG.length - 1].getAttribute("aria-selected")
+    ).toBe("true");
+  });
+
+  it("confirms the focused option with Enter", async () => {
+    await mountApp();
+    const picker = document.getElementById("gpuPicker");
+    const options = () => document.querySelectorAll("#gpuPicker .option-btn");
+    picker.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true })
+    );
+    const focused = options()[1];
+    focused.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Enter", bubbles: true })
+    );
+    expect(focused.getAttribute("aria-selected")).toBe("true");
+    expect(document.getElementById("gpuNote").textContent).toBe(
+      GPU_CATALOG[1].note
+    );
+  });
 });
 
 describe("inline validation", () => {
