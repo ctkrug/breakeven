@@ -299,6 +299,17 @@ describe("shareable URL state", () => {
       String(DEFAULT_TOKENS_PER_MONTH)
     );
   });
+
+  it("restores a custom API price override encoded in the URL", async () => {
+    document.body.innerHTML = '<div id="app"></div>';
+    window.history.replaceState(null, "", "/?apiPrice=7.5");
+    stubCanvasContext();
+    vi.resetModules();
+    await import("../src/main.js");
+
+    expect(document.getElementById("customApiInput").value).toBe("7.5");
+    expect(document.getElementById("customApiError").textContent).toBe("");
+  });
 });
 
 describe("methodology panel", () => {
