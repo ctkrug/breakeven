@@ -54,7 +54,14 @@ app.innerHTML = `
           step="100000"
         />
         <div class="slider-value-row">
-          <input type="number" id="tokensNumber" class="field-input" min="0" step="100000" />
+          <input
+            type="number"
+            id="tokensNumber"
+            class="field-input"
+            min="0"
+            step="100000"
+            aria-label="Monthly token volume"
+          />
           <span class="field-suffix">tokens / month</span>
         </div>
         <p class="field-error" id="tokensError" role="alert"></p>
