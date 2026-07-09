@@ -71,4 +71,31 @@ describe("decodeScenario with invalid values", () => {
     expect(decoded.gpuId).toBe("rtx3090");
     expect(decoded.apiPriceId).toBe(DEFAULTS.apiPriceId);
   });
+
+  it("falls back on non-finite numeric fields instead of throwing", () => {
+    const decoded = decodeScenario(
+      "tokens=NaN&kwh=Infinity&util=-Infinity&life=NaN",
+      DEFAULTS,
+      VALID
+    );
+    expect(decoded).toEqual(DEFAULTS);
+  });
+
+  it("does not throw on malformed percent-encoding or garbage query strings", () => {
+    expect(() => decodeScenario("%E0%A4%A", DEFAULTS, VALID)).not.toThrow();
+    expect(() => decodeScenario("???&&&===", DEFAULTS, VALID)).not.toThrow();
+    expect(() => decodeScenario("tokens=🚀", DEFAULTS, VALID)).not.toThrow();
+    expect(decodeScenario("tokens=🚀", DEFAULTS, VALID).tokensPerMonth).toBe(
+      DEFAULTS.tokensPerMonth
+    );
+  });
+
+  it("ignores an unknown extra query parameter", () => {
+    const decoded = decodeScenario(
+      "tokens=1000000&haunted=true",
+      DEFAULTS,
+      VALID
+    );
+    expect(decoded.tokensPerMonth).toBe(1_000_000);
+  });
 });
