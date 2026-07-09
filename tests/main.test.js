@@ -65,6 +65,14 @@ describe("app bootstrap", () => {
     expect(document.getElementById("tokensSlider")).not.toBeNull();
   });
 
+  it("gives the token-volume number input an accessible name", async () => {
+    await mountApp();
+    const number = document.getElementById("tokensNumber");
+    expect(
+      number.getAttribute("aria-label") || number.labels?.length
+    ).toBeTruthy();
+  });
+
   it("shows a breakeven value matching the model for the default scenario", async () => {
     await mountApp();
     const defaultGpu = GPU_CATALOG[0];
