@@ -177,6 +177,23 @@ describe("GPU picker", () => {
       GPU_CATALOG[1].note
     );
   });
+
+  it("confirms the focused option with the Space key", async () => {
+    await mountApp();
+    const picker = document.getElementById("gpuPicker");
+    const options = () => document.querySelectorAll("#gpuPicker .option-btn");
+    picker.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true })
+    );
+    const focused = options()[GPU_CATALOG.length - 1];
+    focused.dispatchEvent(
+      new KeyboardEvent("keydown", { key: " ", bubbles: true })
+    );
+    expect(focused.getAttribute("aria-selected")).toBe("true");
+    expect(document.getElementById("gpuNote").textContent).toBe(
+      GPU_CATALOG[GPU_CATALOG.length - 1].note
+    );
+  });
 });
 
 describe("inline validation", () => {
