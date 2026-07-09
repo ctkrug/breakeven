@@ -22,7 +22,7 @@ warm-papered, and poster-loud instead — no ink-blue grid, no near-black surfac
 | `--surface-1`      | `#FFFFFF` | cards, panels                                  |
 | `--surface-2`      | `#E8E1D2` | secondary panels, input tracks, table stripes  |
 | `--text`           | `#14120F` | primary ink                                    |
-| `--text-muted`     | `#6B6459` | secondary labels, captions                     |
+| `--text-muted`     | `#5C564C` | secondary labels, captions                     |
 | `--accent`         | `#E8451A` | API cost line, primary CTA, "rent" side        |
 | `--accent-support` | `#0E7C7B` | self-host cost line, "own" side                |
 | `--success`        | `#1F9D55` | positive/confirmation states                   |
