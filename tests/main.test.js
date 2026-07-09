@@ -188,6 +188,32 @@ describe("inline validation", () => {
     );
   });
 
+  it("accepts a valid electricity price edit and recomputes the breakeven value", async () => {
+    await mountApp();
+    const input = document.getElementById("kwhInput");
+    const error = document.getElementById("kwhError");
+    const before = document.getElementById("breakevenValue").textContent;
+    input.value = "1.50";
+    input.dispatchEvent(new Event("input"));
+    expect(error.textContent).toBe("");
+    expect(document.getElementById("breakevenValue").textContent).not.toBe(
+      before
+    );
+  });
+
+  it("accepts a valid utilization edit and recomputes the breakeven value", async () => {
+    await mountApp();
+    const input = document.getElementById("utilInput");
+    const error = document.getElementById("utilError");
+    const before = document.getElementById("breakevenValue").textContent;
+    input.value = "20";
+    input.dispatchEvent(new Event("input"));
+    expect(error.textContent).toBe("");
+    expect(document.getElementById("breakevenValue").textContent).not.toBe(
+      before
+    );
+  });
+
   it("accepts a valid lifetime edit and clears any prior error", async () => {
     await mountApp();
     const input = document.getElementById("lifetimeInput");
