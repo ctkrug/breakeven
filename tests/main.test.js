@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { breakevenTokens, monthlySelfHostCost } from "../src/model.js";
 import {
   API_PRICE_CATALOG,
@@ -6,6 +6,24 @@ import {
   DEFAULT_TOKENS_PER_MONTH,
   GPU_CATALOG,
 } from "../src/data.js";
+
+// main.js registers a window "resize" listener on import. Each test re-imports
+// it via vi.resetModules(), and since window itself isn't reset between tests
+// in the same file, those listeners would otherwise accumulate and let stale
+// module instances race the current test's assertions on a later resize.
+const originalAddEventListener = window.addEventListener.bind(window);
+let trackedResizeHandlers = [];
+window.addEventListener = (type, handler, options) => {
+  if (type === "resize") trackedResizeHandlers.push(handler);
+  return originalAddEventListener(type, handler, options);
+};
+
+afterEach(() => {
+  trackedResizeHandlers.forEach((handler) =>
+    window.removeEventListener("resize", handler)
+  );
+  trackedResizeHandlers = [];
+});
 
 function stubCanvasContext() {
   const ctx = {
@@ -82,6 +100,14 @@ describe("app bootstrap", () => {
     number.value = "5000000";
     number.dispatchEvent(new Event("input"));
     expect(slider.value).toBe("5000000");
+  });
+
+  it("leaves no window resize listener behind for the next test", async () => {
+    // Proves the afterEach cleanup above actually tears down the listener
+    // main.js registers on import, rather than letting it accumulate across
+    // every test in this file that mounts the app.
+    await mountApp();
+    expect(trackedResizeHandlers).toHaveLength(1);
   });
 });
 
