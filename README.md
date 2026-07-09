@@ -1,71 +1,103 @@
 # Breakeven
 
+**▶ Live demo: [apps.charliekrug.com/breakeven](https://apps.charliekrug.com/breakeven/)**
+
 [![CI](https://github.com/ctkrug/breakeven/actions/workflows/ci.yml/badge.svg)](https://github.com/ctkrug/breakeven/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**Where does self-hosting an open model actually beat paying per-token?**
+**See where self-hosting an open model beats paying an API per token.**
 
-Breakeven is a small, focused calculator: enter your monthly token volume and pick a GPU, and
-it plots the true crossover between running your own hardware and paying an API per token —
-amortized GPU cost, electricity, and utilization included. Drag the slider, watch the two lines
-cross, and read off the number: _"break-even: 42M tokens/mo."_
+Breakeven is a small, focused calculator for engineers and technical founders running a steady
+LLM workload. Enter your monthly token volume, pick a GPU, and it plots the real crossover between
+owning hardware and paying per token: GPU purchase amortized over its lifetime, electricity, and
+utilization all folded in. Drag the slider, watch the two lines cross, and read off the number.
 
-## Why
+## Why it exists
 
-Every "should I self-host?" debate on Twitter turns into people quoting a single per-token price
-against a single GPU rental rate, with no amortization, no utilization assumption, and no
-electricity cost. That's not a fair comparison — it's a vibe. Breakeven turns the vibe into a
-chart: give it real inputs (token volume, GPU choice, hours/day the box actually runs, power
-price) and it tells you the exact monthly volume at which owning wins.
+Every "should we self-host?" thread settles the same lazy way: one per-token API price quoted
+against one GPU rental rate, with no amortization, no utilization, and no electricity cost. That
+is not a comparison, it is a guess. Breakeven turns the guess into a chart. Give it real inputs
+(token volume, GPU, hours per day the box actually runs, power price) and it tells you the exact
+monthly volume at which owning wins.
 
-## The wow moment
+## Sample output
 
-Move the monthly-tokens slider. Two lines are plotted live — **API cost** (linear in tokens) and
-**self-host cost** (flat-ish: GPU amortization + power, independent of volume up to the GPU's
-throughput ceiling). Where they cross lights up on the chart with the number: _"break-even: 42M
-tokens/mo."_ Everything below that volume, renting wins. Everything above it, owning wins.
+```
+                    BREAK-EVEN
+                    42M tokens/mo
+
+  cost ($/mo)
+    |            API cost  ╱
+    |                    ╱
+    |         ┄┄┄┄┄┄┄┄┄●┄┄┄┄┄┄┄  self-host (flat)
+    |        ╱         ┆
+    |      ╱           ┆ break-even
+    +──────────────────┴──────────────  tokens / month
+```
+
+Below 42M tokens/mo the API is cheaper; above it, owning an RTX 4090 wins. Change the GPU,
+the electricity price, or the API reference and the crossover moves live.
 
 ## Features
 
-- **Token volume input** — slider + direct numeric entry, with inline validation on bad input.
-- **GPU catalog** — four real GPUs (consumer + datacenter: RTX 3090, RTX 4090, A100 80GB,
-  H100 80GB) with purchase price, power draw, and a documented tokens/sec basis for each.
-- **API price catalog** — four reference API price points ($/million tokens), or type a
-  custom price that overrides the selected reference without deselecting it.
-- **Amortization model** — GPU cost spread over an editable hardware lifetime (months), plus
-  electricity cost from power draw × runtime hours × $/kWh, plus an editable utilization factor.
-- **Live crossover chart** — self-host cost line vs. API cost line over a token-volume axis,
-  with the break-even point annotated directly on the chart and re-stamped on every change.
-- **Throughput ceiling** — past a GPU's tokens/mo ceiling the self-host line switches to a
-  dashed extrapolation, with a visible note that scaling further needs a second GPU.
-- **Shareable scenario** — every input round-trips through the URL query string; "Copy
-  shareable link" puts it on the clipboard.
-- **Methodology panel** — a plain-language explanation of both cost formulas plus the
-  documented basis for every default and catalog entry.
+- **Token volume input:** slider plus direct numeric entry, with inline validation on bad input.
+- **GPU catalog:** four real GPUs (RTX 3090, RTX 4090, A100 80GB, H100 80GB) with purchase price,
+  power draw, and a documented tokens/sec serving basis for each.
+- **API price catalog:** four reference price points ($/million tokens), or type a custom price
+  that overrides the selection without deselecting it.
+- **Amortization model:** GPU cost spread over an editable hardware lifetime, plus electricity from
+  power draw × runtime hours × $/kWh, plus an editable utilization factor.
+- **Live crossover chart:** self-host vs. API cost over a token-volume axis, with the break-even
+  point annotated on the chart and re-stamped on every change.
+- **Throughput ceiling:** past a GPU's tokens/mo ceiling the self-host line goes dashed, with a
+  note that scaling further needs a second GPU.
+- **Shareable scenario:** every input round-trips through the URL; "Copy shareable link" puts it on
+  the clipboard, no server or account involved.
+- **Methodology panel:** a plain-language explanation of both cost formulas and the documented
+  basis for every default and catalog entry.
+
+## How it works
+
+The API cost line is `monthlyTokens / 1,000,000 × pricePerMillionTokens`, linear in volume. The
+self-host line is `gpuPrice / lifetimeMonths + electricity`, where electricity is
+`powerDrawWatts / 1000 × hoursPerDay × 30.44 × utilization × pricePerKwh`, flat and independent of
+volume until the GPU's throughput ceiling. The break-even volume is where the two are equal:
+`selfHostMonthlyCost / pricePerMillionTokens × 1,000,000`. All of this lives in
+[`src/model.js`](src/model.js), a dependency-free pure-function core unit-tested apart from the UI.
 
 ## Stack
 
-Plain JavaScript, no framework: a Vite-built static site with vanilla JS + Canvas for the chart
-and a small pure-function core (`src/model.js`) that holds the cost math, unit-tested in
-isolation from the UI. Ships as a single static `site/` directory — no server, no build
-dependencies beyond Vite.
+Plain JavaScript, no framework: a Vite-built static site with vanilla JS and Canvas for the chart,
+plus a small pure-function core for the cost math. Ships as a single static `site/` directory with
+no runtime dependencies.
 
 ## Getting started
 
 ```sh
 npm install
 npm run dev      # local dev server
-npm test         # run the cost-model unit tests
+npm test         # run the test suite
 npm run build    # production build to site/
 ```
 
-## Status
+## Testing
 
-Core calculator is functionally complete — see [`docs/VISION.md`](docs/VISION.md) for the full
-design, [`docs/DESIGN.md`](docs/DESIGN.md) for the visual direction,
-[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the codebase map, and
-[`docs/BACKLOG.md`](docs/BACKLOG.md) for what's left.
+100 tests across the cost model, chart math, validation, URL state, and the wired-up UI, including
+property-based tests (fast-check) on the core math. Run `npm run test:coverage` for the report
+(100% statement, 98% branch on `src/`).
+
+## Docs
+
+- [`docs/VISION.md`](docs/VISION.md): the product idea and scope.
+- [`docs/DESIGN.md`](docs/DESIGN.md): the visual direction and tokens.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): the codebase map.
+- [`docs/BACKLOG.md`](docs/BACKLOG.md): what is done and what is left.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE).
+
+---
+
+More of Charlie's projects → [apps.charliekrug.com](https://apps.charliekrug.com)
+</content>
