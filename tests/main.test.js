@@ -424,9 +424,7 @@ describe("GPU throughput ceiling", () => {
     // ceiling at default utilization, so this reliably crosses it.
     number.value = "500000000";
     number.dispatchEvent(new Event("input"));
-    expect(ceilingNote.classList.contains("ceiling-note--exceeded")).toBe(
-      true
-    );
+    expect(ceilingNote.classList.contains("ceiling-note--exceeded")).toBe(true);
 
     number.value = "1";
     number.dispatchEvent(new Event("input"));

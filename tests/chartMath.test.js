@@ -24,10 +24,26 @@ describe("linearScale", () => {
   it("always maps both domain endpoints exactly onto the range endpoints", () => {
     fc.assert(
       fc.property(
-        fc.float({ min: Math.fround(-1e6), max: Math.fround(1e6), noNaN: true }),
-        fc.float({ min: Math.fround(-1e6), max: Math.fround(1e6), noNaN: true }),
-        fc.float({ min: Math.fround(-1e3), max: Math.fround(1e3), noNaN: true }),
-        fc.float({ min: Math.fround(-1e3), max: Math.fround(1e3), noNaN: true }),
+        fc.float({
+          min: Math.fround(-1e6),
+          max: Math.fround(1e6),
+          noNaN: true,
+        }),
+        fc.float({
+          min: Math.fround(-1e6),
+          max: Math.fround(1e6),
+          noNaN: true,
+        }),
+        fc.float({
+          min: Math.fround(-1e3),
+          max: Math.fround(1e3),
+          noNaN: true,
+        }),
+        fc.float({
+          min: Math.fround(-1e3),
+          max: Math.fround(1e3),
+          noNaN: true,
+        }),
         (d0, d1, r0, r1) => {
           fc.pre(d0 !== d1);
           const scale = linearScale([d0, d1], [r0, r1]);
