@@ -312,6 +312,31 @@ describe("shareable URL state", () => {
   });
 });
 
+describe("GPU throughput ceiling", () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it("flags the ceiling-exceeded state once volume passes the GPU's throughput", async () => {
+    await mountApp();
+    const number = document.getElementById("tokensNumber");
+    const ceilingNote = document.getElementById("ceilingNote");
+    // Slider max (500M tokens/mo) exceeds every catalog GPU's throughput
+    // ceiling at default utilization, so this reliably crosses it.
+    number.value = "500000000";
+    number.dispatchEvent(new Event("input"));
+    expect(ceilingNote.classList.contains("ceiling-note--exceeded")).toBe(
+      true
+    );
+
+    number.value = "1";
+    number.dispatchEvent(new Event("input"));
+    expect(ceilingNote.classList.contains("ceiling-note--exceeded")).toBe(
+      false
+    );
+  });
+});
+
 describe("methodology panel", () => {
   beforeEach(() => {
     vi.resetModules();
