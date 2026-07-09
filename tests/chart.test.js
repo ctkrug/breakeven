@@ -134,4 +134,14 @@ describe("drawChart", () => {
     expect(labelCall.x).toBeGreaterThanOrEqual(72);
     expect(labelCall.x + labelWidth).toBeLessThanOrEqual(width - 24);
   });
+
+  it("formats sub-1M x-axis ticks in thousands, not millions", () => {
+    const { ctx, calls } = createStubContext();
+    drawChart(
+      ctx,
+      { width: 800, height: 500 },
+      { ...baseParams, tokensMax: 100_000, breakevenTokens: Infinity }
+    );
+    expect(calls.textCalls.some((c) => /^\d+K$/.test(c.text))).toBe(true);
+  });
 });
