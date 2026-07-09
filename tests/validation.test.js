@@ -25,6 +25,15 @@ describe("validateTokensPerMonth", () => {
     expect(validateTokensPerMonth("abc").valid).toBe(false);
     expect(validateTokensPerMonth("").valid).toBe(false);
   });
+
+  it("rejects whitespace, emoji, and non-finite input", () => {
+    expect(validateTokensPerMonth("   ").valid).toBe(false);
+    expect(validateTokensPerMonth("🚀").valid).toBe(false);
+    expect(validateTokensPerMonth("NaN").valid).toBe(false);
+    expect(validateTokensPerMonth("Infinity").valid).toBe(false);
+    expect(validateTokensPerMonth(NaN).valid).toBe(false);
+    expect(validateTokensPerMonth(Infinity).valid).toBe(false);
+  });
 });
 
 describe("validatePrice", () => {
@@ -40,6 +49,16 @@ describe("validatePrice", () => {
   it("includes the given label in the error message", () => {
     const result = validatePrice(0, "Electricity price");
     expect(result.error).toMatch(/Electricity price/);
+  });
+
+  it("rejects non-numeric, whitespace, and non-finite input", () => {
+    expect(validatePrice("abc").valid).toBe(false);
+    expect(validatePrice("   ").valid).toBe(false);
+    expect(validatePrice("🚀").valid).toBe(false);
+    expect(validatePrice("NaN").valid).toBe(false);
+    expect(validatePrice("Infinity").valid).toBe(false);
+    expect(validatePrice(NaN).valid).toBe(false);
+    expect(validatePrice(Infinity).valid).toBe(false);
   });
 });
 
@@ -63,6 +82,14 @@ describe("validateUtilizationPercent", () => {
     expect(validateUtilizationPercent(-1).valid).toBe(false);
     expect(validateUtilizationPercent(101).valid).toBe(false);
   });
+
+  it("rejects non-numeric and non-finite input", () => {
+    expect(validateUtilizationPercent("abc").valid).toBe(false);
+    expect(validateUtilizationPercent("   ").valid).toBe(false);
+    expect(validateUtilizationPercent("🚀").valid).toBe(false);
+    expect(validateUtilizationPercent(NaN).valid).toBe(false);
+    expect(validateUtilizationPercent(Infinity).valid).toBe(false);
+  });
 });
 
 describe("validateLifetimeMonths", () => {
@@ -76,5 +103,13 @@ describe("validateLifetimeMonths", () => {
   it("rejects zero and negative values", () => {
     expect(validateLifetimeMonths(0).valid).toBe(false);
     expect(validateLifetimeMonths(-12).valid).toBe(false);
+  });
+
+  it("rejects non-numeric and non-finite input", () => {
+    expect(validateLifetimeMonths("abc").valid).toBe(false);
+    expect(validateLifetimeMonths("   ").valid).toBe(false);
+    expect(validateLifetimeMonths("🚀").valid).toBe(false);
+    expect(validateLifetimeMonths(NaN).valid).toBe(false);
+    expect(validateLifetimeMonths(Infinity).valid).toBe(false);
   });
 });
