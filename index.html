@@ -32,6 +32,107 @@
   </head>
   <body>
     <div id="app"></div>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <section class="explainer" aria-labelledby="explainerTitle">
+          <h2 id="explainerTitle">
+            Self-hosting vs. an API: find the number, not the vibe
+          </h2>
+          <p>
+            Every "should we self-host our LLM?" thread ends the same way:
+            someone quotes a single per-token API price against a single GPU
+            rental rate and calls it settled. That skips the parts that actually
+            decide it. A GPU is a fixed monthly cost once you amortize the
+            purchase and add power. An API is a per-token cost that grows with
+            every request. The honest question is where those two lines cross,
+            and Breakeven draws that crossing for your numbers.
+          </p>
+          <p>
+            Set your monthly token volume with the slider or type it in. Pick a
+            GPU from the catalog (RTX 3090, RTX 4090, A100 80GB, H100 80GB) with
+            its real purchase price, power draw, and a documented
+            serving-throughput figure. Adjust the assumptions that move the
+            answer: electricity price per kWh, how hard the box is actually
+            worked (utilization), and the hardware lifetime you amortize over.
+            The chart replots live and stamps the break-even volume above it,
+            such as "42M tokens/mo." Below that volume, paying the API wins.
+            Above it, owning the card wins. Past the point where one GPU can no
+            longer serve your volume, the self-host line goes dashed and tells
+            you a second card is needed.
+          </p>
+          <p>
+            Nothing is hidden in a spreadsheet. The API line is monthly tokens
+            divided by a million, times the price per million. The self-host
+            line is the GPU price spread across its lifetime in months, plus
+            electricity from power draw times runtime hours times utilization
+            times your kWh rate. Every default and catalog number has a written
+            basis in the methodology panel, and every input round-trips through
+            the URL so you can copy a link and hand someone the exact scenario.
+          </p>
+
+          <h3>FAQ</h3>
+          <dl class="faq">
+            <dt>How is the break-even point calculated?</dt>
+            <dd>
+              It is the token volume where the flat monthly self-host cost
+              equals the linear API cost: self-host monthly cost divided by the
+              API price per million tokens, times one million. Change any
+              assumption and the crossover moves.
+            </dd>
+
+            <dt>Where do the GPU throughput numbers come from?</dt>
+            <dd>
+              They are approximate aggregate sustained tokens per second for
+              serving a 7B open model, 4-bit quantized, through a
+              continuous-batching server like vLLM or TGI. That is the "small
+              team serving concurrent requests" case, not a single-stream chat
+              benchmark. Treat them as editable starting points.
+            </dd>
+
+            <dt>
+              Does this include the cost of running the model, not just buying
+              the GPU?
+            </dt>
+            <dd>
+              Yes. The self-host figure is hardware amortization plus
+              electricity, and electricity already factors in power draw,
+              runtime hours, and utilization. It does not try to price your
+              engineering time, which is the one cost only you can put a number
+              on.
+            </dd>
+
+            <dt>
+              My electricity rate and utilization are different. Can I change
+              them?
+            </dt>
+            <dd>
+              Every assumption is an editable field: electricity price,
+              utilization, hardware lifetime, and the API price (pick a
+              reference or type your own). Bad input is caught inline and the
+              last valid chart stays on screen.
+            </dd>
+
+            <dt>Can I share a specific scenario with a colleague?</dt>
+            <dd>
+              Yes. The full scenario lives in the URL, so "Copy shareable link"
+              hands over a link that reopens the exact chart, no account or
+              server involved.
+            </dd>
+          </dl>
+        </section>
+
+        <div class="footer-meta">
+          <a class="btn footer-cta" href="https://github.com/ctkrug/breakeven">
+            View on GitHub
+          </a>
+          <a class="portfolio-link" href="https://apps.charliekrug.com">
+            More by Charlie Krug &rarr; apps.charliekrug.com
+          </a>
+        </div>
+      </div>
+    </footer>
+
     <script type="module" src="./src/main.js"></script>
   </body>
 </html>
