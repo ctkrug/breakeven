@@ -22,6 +22,6 @@ export default [
     },
   },
   {
-    ignores: ["site/", "node_modules/"],
+    ignores: ["site/", "node_modules/", "coverage/"],
   },
 ];
