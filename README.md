@@ -47,7 +47,7 @@ tokens/mo."_ Everything below that volume, renting wins. Everything above it, ow
 
 Plain JavaScript, no framework: a Vite-built static site with vanilla JS + Canvas for the chart
 and a small pure-function core (`src/model.js`) that holds the cost math, unit-tested in
-isolation from the UI. Ships as a single static `dist/` directory — no server, no build
+isolation from the UI. Ships as a single static `site/` directory — no server, no build
 dependencies beyond Vite.
 
 ## Getting started
