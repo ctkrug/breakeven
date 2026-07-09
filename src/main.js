@@ -11,7 +11,7 @@ import {
   TOKENS_SLIDER_MAX,
   TOKENS_SLIDER_MIN,
 } from "./data.js";
-import { drawChart, fitCanvasToContainer } from "./chart.js";
+import { drawChart, fitCanvasToContainer, formatTokens } from "./chart.js";
 import {
   validateLifetimeMonths,
   validatePrice,
@@ -155,12 +155,6 @@ tokensSlider.max = String(TOKENS_SLIDER_MAX);
 tokensSlider.value = String(state.tokensPerMonth);
 tokensNumber.value = String(state.tokensPerMonth);
 
-function formatTokensLabel(n) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
-  return `${Math.round(n)}`;
-}
-
 function currentSelfHostMonthlyCost() {
   return monthlySelfHostCost({
     gpuPrice: state.gpu.gpuPrice,
@@ -189,7 +183,7 @@ function render() {
   const breakeven = breakevenTokens(selfHostCost, pricePerMillionTokens);
 
   const breakevenLabel = Number.isFinite(breakeven)
-    ? `${formatTokensLabel(breakeven)} tokens/mo`
+    ? `${formatTokens(breakeven)} tokens/mo`
     : "never";
   if (breakevenLabel !== breakevenValueEl.textContent) {
     breakevenValueEl.textContent = breakevenLabel;
@@ -200,7 +194,7 @@ function render() {
   }
 
   const pastCeiling = state.tokensPerMonth > ceilingTokens;
-  ceilingNote.textContent = `${state.gpu.name} tops out around ${formatTokensLabel(ceilingTokens)} tokens/mo at this utilization — scaling further requires a second GPU.`;
+  ceilingNote.textContent = `${state.gpu.name} tops out around ${formatTokens(ceilingTokens)} tokens/mo at this utilization — scaling further requires a second GPU.`;
   ceilingNote.classList.toggle("ceiling-note--exceeded", pastCeiling);
 
   const { width, height, ctx } = fitCanvasToContainer(canvas);

@@ -81,7 +81,9 @@ describe("app bootstrap", () => {
       API_PRICE_CATALOG[0].pricePerMillionTokens
     );
     const text = document.getElementById("breakevenValue").textContent;
-    expect(text).toContain(`${(expected / 1_000_000).toFixed(1)}M`);
+    // Matches formatTokens in src/chart.js: values at 10M+ drop the decimal.
+    const decimals = expected >= 10_000_000 ? 0 : 1;
+    expect(text).toContain(`${(expected / 1_000_000).toFixed(decimals)}M`);
   });
 
   it("updates the token number field and redraws when the slider moves", async () => {
