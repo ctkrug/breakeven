@@ -18,7 +18,9 @@ src/
                  (kept separate from chart.js so it's testable without a canvas)
   chart.js       canvas renderer: fitCanvasToContainer (devicePixelRatio scaling)
                  + drawChart (both cost lines, breakeven marker, ceiling dash,
-                 current-volume dots, registration marks)
+                 current-volume dots, registration marks) + the shared
+                 formatTokens() label formatter (also used by main.js, so the
+                 big callout and the on-chart annotation always agree)
   main.js        DOM wiring: builds the app shell, owns `state`, and drives
                  render() on every input change
   style.css      design tokens (docs/DESIGN.md) + all component styling
@@ -51,19 +53,26 @@ selection, Tab reaches the widget as a single stop, Enter/Space or click confirm
 ## Testing
 
 - `model.js`, `data.js`, `validation.js`, `urlState.js`, `chartMath.js` are pure — tested
-  directly with plain Vitest (Node environment is enough).
+  directly with plain Vitest (Node environment is enough). Each also has property-based
+  tests (via `fast-check`) pinning the invariants that must hold for any input — e.g.
+  `linearScale` maps both domain endpoints exactly, `breakevenTokens` round-trips through
+  `monthlyApiCost`, every validator's valid/invalid boundary matches its exact predicate.
 - `chart.js` is tested against a hand-written stub `CanvasRenderingContext2D` (records
   calls instead of rendering), since jsdom has no real canvas backend.
 - `main.js` is tested under `vitest`'s `jsdom` environment (see `vite.config.js`), with
   `HTMLCanvasElement.prototype.getContext` stubbed the same way, driving real DOM events
-  (`input`, `click`, `keydown`) and asserting on the resulting DOM state.
+  (`input`, `click`, `keydown`) and asserting on the resulting DOM state. Since each test
+  re-imports `main.js` via `vi.resetModules()` and the module registers a `window` resize
+  listener on load, the test file tracks and tears down those listeners in `afterEach` so
+  stale mounts from earlier tests can't fire into a later test's assertions.
 
 ## Running it
 
 ```sh
 npm install
-npm run dev      # local dev server
-npm test         # full vitest suite
-npm run lint      # eslint
-npm run build     # static build to site/ (base path is relative — see vite.config.js)
+npm run dev            # local dev server
+npm test                # full vitest suite
+npm run test:coverage   # vitest with a v8 coverage report
+npm run lint             # eslint
+npm run build            # static build to site/ (base path is relative — see vite.config.js)
 ```
