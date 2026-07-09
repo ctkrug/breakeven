@@ -372,4 +372,16 @@ describe("copy shareable link", () => {
       "Link copied."
     );
   });
+
+  it("falls back to showing the raw URL when clipboard access fails", async () => {
+    await mountApp();
+    const writeText = vi.fn().mockRejectedValue(new Error("denied"));
+    Object.assign(navigator, { clipboard: { writeText } });
+    document.getElementById("copyLinkBtn").click();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(document.getElementById("copyStatus").textContent).toBe(
+      window.location.href
+    );
+  });
 });
