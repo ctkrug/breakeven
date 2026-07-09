@@ -1,3 +1,4 @@
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import {
   validateLifetimeMonths,
@@ -111,5 +112,47 @@ describe("validateLifetimeMonths", () => {
     expect(validateLifetimeMonths("🚀").valid).toBe(false);
     expect(validateLifetimeMonths(NaN).valid).toBe(false);
     expect(validateLifetimeMonths(Infinity).valid).toBe(false);
+  });
+});
+
+describe("validator properties across arbitrary numeric input", () => {
+  it("validatePrice is valid exactly when finite and greater than zero", () => {
+    fc.assert(
+      fc.property(fc.float(), (n) => {
+        const result = validatePrice(n);
+        expect(result.valid).toBe(Number.isFinite(n) && n > 0);
+        if (result.valid) expect(result.value).toBe(n);
+      })
+    );
+  });
+
+  it("validateLifetimeMonths is valid exactly when finite and greater than zero", () => {
+    fc.assert(
+      fc.property(fc.float(), (n) => {
+        const result = validateLifetimeMonths(n);
+        expect(result.valid).toBe(Number.isFinite(n) && n > 0);
+        if (result.valid) expect(result.value).toBe(n);
+      })
+    );
+  });
+
+  it("validateTokensPerMonth is valid exactly when finite and non-negative", () => {
+    fc.assert(
+      fc.property(fc.float(), (n) => {
+        const result = validateTokensPerMonth(n);
+        expect(result.valid).toBe(Number.isFinite(n) && n >= 0);
+        if (result.valid) expect(result.value).toBe(n);
+      })
+    );
+  });
+
+  it("validateUtilizationPercent is valid exactly within [0, 100] and converts to a fraction", () => {
+    fc.assert(
+      fc.property(fc.float(), (n) => {
+        const result = validateUtilizationPercent(n);
+        expect(result.valid).toBe(Number.isFinite(n) && n >= 0 && n <= 100);
+        if (result.valid) expect(result.value).toBe(n / 100);
+      })
+    );
   });
 });
