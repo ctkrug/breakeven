@@ -341,7 +341,13 @@ a {
 .slider-value-row {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+}
+
+.slider-value-row .field-input {
+  flex: 1 1 140px;
+  min-width: 0;
 }
 
 .field-input {
@@ -374,6 +380,7 @@ a {
 .field-suffix {
   font-size: 0.9rem;
   color: var(--text-muted);
+  white-space: nowrap;
 }
 
 .field-error {
